@@ -9,3 +9,10 @@ target/
 **/*.elf
 partition.bin
 secrets.toml
+target/
+.embuild/
+.espressif/
+**/*.bin
+**/*.elf
+partition.bin
+secrets.toml
