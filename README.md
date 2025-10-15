@@ -1,4 +1,4 @@
-## esp32s3-rust-dht22-mqtt-ota-thingsboard
+# esp32s3-rust-dht22-mqtt-wifi-ota-thingsboard
 ESP32-S3 + Rust project reading DHT22 and sending telemetry to ThingsBoard via MQTT with millisecond timestamps. Includes Wi-Fi setup, MQTT auth/clientId, and OTA over MQTT. Ships with 8MB partition table (factory, ota_0, ota_1). Build/flash with the esp toolchain and espflash.
 
 
@@ -13,32 +13,32 @@ make sure you have 3 code main.rs
 - DHT22 on GPIO4
 - Thingbsoard Cloud
 
-## Installation
-# Prerequisites (Ubuntu)
+# Installation
+## Prerequisites (Ubuntu)
 ```bash
 sudo apt update
 sudo apt install -y git curl build-essential pkg-config libssl-dev libudev-dev clang lld
 ```
 
-# Install ESP Rust toolchain
+## Install ESP Rust toolchain
 ```bash
 cargo install espup
 espup install
 ```
 
-# Load toolchain env (run in every new terminal)
+## Load toolchain env (run in every new terminal)
 ```bash
 source ~/export-esp.sh
 ```
 
-# Project tooling
+## Project tooling
 ```bash
 cargo install 
 cargo-generate espflash
 ```
 
-## Create Project (Template)
-# Generate from template
+# Create Project (Template)
+## Generate from template
 ```bash
 cargo generate esp-rs/esp-idf-template cargo
 ```
@@ -46,12 +46,12 @@ cargo generate esp-rs/esp-idf-template cargo
 - Chip: ESP32-S3
 - Advanced template options: false
 
-# Enter Project
+## Enter Project
 ```bash
 cd (ur project name)
 ```
-## Replace Souces
-# cargo.toml
+# Replace Souces
+## cargo.toml
 ```bash
 [package]
 name = "projectiot"
@@ -92,7 +92,7 @@ serde = { version = "1.0", default-features = false, features = ["derive"] }
 embuild = "0.33"
 ```
 
-# main.rs
+## main.rs ota
 ```bash
 #![no_std]
 #![no_main]
@@ -894,7 +894,7 @@ fn main() -> i32 {
 }
 ```
 
-# Add Partition Table
+## Add Partition Table
 ```bash
 # Name,Type,SubType,Offset,Size,Flags
 nvs,data,nvs,0x9000,0x5000,
@@ -905,26 +905,26 @@ ota_1,app,ota_1,0x410000,2M,
 storage,data,spiffs,0x610000,0x1F0000,
 ```
 
-## Build
-# Ensure env is loaded
+# Build
+## Ensure env is loaded
 ```bash
 source ~/export-esp.sh
 ```
 
-# Build (debug)
+## Build (debug)
 ```bash
 cargo build
 ```
 
-# Ensure IDF_PATH is empty
+## Ensure IDF_PATH is empty
 ```bash
 echo $IDF_PATH
 # if not empty:
 unset IDF_PATH
 ```
 
-## STEP BY STEP UPDATING 
-# add ur main code 
+# STEP BY STEP UPDATING 
+## add ur main code 
 ```bash
 // Atribut untuk lingkungan no-std/embedded
 #![no_std]
@@ -1139,10 +1139,10 @@ fn connect_wifi(wifi: &mut BlockingWifi<EspWifi<'static>>) -> Result<()> {
 }
 ```
 
-# OTA code
+## OTA code
 on top 🔝
 
-# Main code that u want to update
+## Main code that u want to update
 ```bash
 // Atribut untuk lingkungan no-std/embedded
 #![no_std]
@@ -1446,28 +1446,28 @@ fn connect_wifi(wifi: &mut BlockingWifi<EspWifi<'static>>) -> Result<()> {
 }
 ```
 
-## Flash
-# Flash (debug) + monitor
+# Flash
+## Flash (debug) + monitor
 ```bash
 espflash flash target/xtensa-esp32s3-espidf/debug/ur project name --monitor
 ```
 
-# Flash for OTA
+## Flash for OTA
 ```bash
 espflash flash --partition-table partitions.csv --chip esp32s3 target/xtensa-esp32s3-espidf/debug/ur project name --monitor
 ```
 
-# Flash for erasing (sometime ur code is still connect on the device)
+## Flash for erasing (sometime ur code is still connect on the device)
 ```bash
 espflash erase-flash --chip esp32s3 --port /dev/ttyACM0 
 ```
 
-# Flash to make .bin to input the new code
+## Flash to make .bin to input the new code
 ```bash
 espflash save-image target/xtensa-esp32s3-espidf/release/ur project name name.bin
 ```
 
-### Contact
+# Contact
 IG: @adidmuhammad
 Email: hadidqushairi4@gmail.com
 
