@@ -1,5 +1,26 @@
-# esp32s3-rust-dht22-mqtt-wifi-ota-thingsboard
-ESP32-S3 + Rust project reading DHT22 and sending telemetry to ThingsBoard via MQTT with millisecond timestamps. Includes Wi-Fi setup, MQTT auth/clientId, and OTA over MQTT. Ships with 8MB partition table (factory, ota_0, ota_1). Build/flash with the esp toolchain and espflash.
+# 🚀 ESP32-S3 · Rust · DHT22 → MQTT (ThingsBoard) · OTA
+
+Send **real-time telemetry** from an ESP32-S3 to **ThingsBoard** using **MQTT**—built in **Rust**.  
+Includes Wi-Fi setup, authenticated MQTT (clientId/username/password), **millisecond timestamps**, and **OTA over MQTT**.
+
+> ⚙️ Chip: **ESP32-S3** · 🌡️ Sensor: **DHT22** (GPIO4) · 📡 Protocol: **MQTT** · 🧰 Tooling: **esp-rs**, `espflash`
+
+---
+
+### ✨ Highlights
+- 🔌 **Zero-friction setup** — template + scripts, build & flash in minutes.
+- 📶 **Reliable Wi-Fi** — WPA2-PSK with reconnection logic.
+- 📊 **Clean telemetry** — JSON payloads with **ms** timestamps (ThingsBoard-friendly).
+- 🔁 **OTA via MQTT** — request, chunk download, checksum verify, swap partition, reboot.
+- 🪵 **Structured logs** — readable logs over serial for easy debugging.
+
+---
+
+### 🧱 What you get
+- `src/main.rs` — DHT22 read + Wi-Fi + MQTT publish (+ OTA hooks).
+- `Cargo.toml` — pinned crates for ESP-IDF `v5.x`.
+- `partition.csv` — 8MB layout with `factory`, `ota_0`, `ota_1`, `spiffs`.
+- Ready-to-run commands for **build**, **flash**, and **monitor**.
 
 
 ## ALERT⚠️
