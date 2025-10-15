@@ -2,3 +2,10 @@
 /.embuild
 /target
 /Cargo.lock
+target/
+.embuild/
+.espressif/
+**/*.bin
+**/*.elf
+partition.bin
+secrets.toml
