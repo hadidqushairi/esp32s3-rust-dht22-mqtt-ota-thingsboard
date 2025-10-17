@@ -1387,7 +1387,14 @@ fn main() {
     let mut dht22 = Dht22::new(pin, delay);
 
     loop {
-        info!("Memulai iterasi loop baru...");  // Tambah log untuk track loop
+        info!("Mulai iterasi loop baru...");  // Log untuk track loop
+
+        // Ambil timestamp saat mulai baca sensor (pembacaan langsung untuk latensi)
+        let mut tv: esp_idf_sys::timeval = unsafe { core::mem::zeroed() };
+        unsafe {
+            esp_idf_sys::gettimeofday(&mut tv, core::ptr::null_mut());
+        }
+        let read_timestamp_ms = (tv.tv_sec as u64 * 1000) + (tv.tv_usec as u64 / 1000);
 
         let mut reading = None;
         for attempt in 1..=3 {  // Retry 3 kali jika gagal
@@ -1410,43 +1417,51 @@ fn main() {
                 reading.temperature, reading.humidity
             );
 
-            // TAMBAHAN UNTUK CLIENT-SIDE TIMESTAMP: Ambil timestamp UNIX dalam milidetik menggunakan gettimeofday (no_std compatible)
+            // Ambil timestamp saat siap publish (untuk hitung latensi internal)
             let mut tv: esp_idf_sys::timeval = unsafe { core::mem::zeroed() };
             unsafe {
                 esp_idf_sys::gettimeofday(&mut tv, core::ptr::null_mut());
             }
-            let timestamp_ms = (tv.tv_sec as u64 * 1000) + (tv.tv_usec as u64 / 1000);
+            let publish_timestamp_ms = (tv.tv_sec as u64 * 1000) + (tv.tv_usec as u64 / 1000);
 
-            // Konversi ke human-readable untuk logging (misal: "2025-10-05 12:34:56")
-            let human_time = timestamp_to_string(timestamp_ms / 1000); // Konversi ms ke detik
+            // Hitung latensi internal (publish - read) untuk log/analisa
+            let latency_internal_ms = publish_timestamp_ms - read_timestamp_ms;
+            info!("Latensi internal (publish - read): {} ms", latency_internal_ms);
+
+            // Konversi ke human-readable untuk logging
+            let human_time_read = timestamp_to_string(read_timestamp_ms / 1000);
+            let human_time_publish = timestamp_to_string(publish_timestamp_ms / 1000);
 
             // Payload dengan client-side timestamp untuk perbandingan RTC vs server timestamp di ThingsBoard
             let payload = json!({
-                "ts": timestamp_ms,
+                "ts": publish_timestamp_ms,
                 "values": {
                     "temperature": reading.temperature,
                     "humidity": reading.humidity,
-                    "client_ts": timestamp_ms
+                    "read_ts": read_timestamp_ms,
+                    "publish_ts": publish_timestamp_ms,
+                    "latency_internal_ms": latency_internal_ms
                 }
             }).to_string();
             
             match mqtt_client.publish("v1/devices/me/telemetry", &payload, 1) {
-                Ok(_) => info!("📡 Telemetri terkirim dengan client-side timestamp (human: {}): {}", human_time, payload),
+                Ok(_) => info!("📡 Telemetri terkirim dengan read_ts (human: {}) dan publish_ts (human: {}): {}", human_time_read, human_time_publish, payload),
                 Err(e) => error!("❌ Gagal mengirim telemetri: {:?}", e),
             }
+
         } else {
             error!("❌ Gagal membaca DHT22 setelah 3 attempt. Melanjutkan loop.");
         }
         
         unsafe {
-            vTaskDelay(ms_to_ticks(300000));  // Ubah ke 10 detik untuk tes; kembalikan ke 300000 nanti
+            vTaskDelay(ms_to_ticks(300000));  // Delay 3 detik seperti kode asli
         }
     }
 }
 
 fn connect_wifi(wifi: &mut BlockingWifi<EspWifi<'static>>) -> Result<()> {
-    let ssid = "Laboratorium I & C";
-    let password = "tanyamasgani";
+    let ssid = "wachito2";
+    let password = "hadid123";
     
     info!("Menghubungkan ke WiFi SSID: {}", ssid);
     let wifi_config = Configuration::Client(ClientConfiguration {
